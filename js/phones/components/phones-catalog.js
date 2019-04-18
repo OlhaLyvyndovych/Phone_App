@@ -1,62 +1,23 @@
 import Component from './component.js';
-import ShoppingCart from './shopping-cart.js';
-
-
 export default class PhonesCatalog extends Component{
     constructor({
         element,
-        phones = [],
-        items = []
+        phones = []
     }) {
         super({ element });
         this._phones = phones;
-
         this._render();
-
         this.on('click', '[data-element="details-link"]', (event) => {
             const phoneEl = event.target.closest('[data-element="phone-element"]');
             const phoneId = phoneEl.dataset.phoneId;
             this.emit('phone-selected', phoneId);
         })
 
-        this.on('click', '[data-element="add-button"]', (event) => {
+        this.on('click', '[data-element="add-to-cart"]', (event) => {
             const phoneEl = event.target.closest('[data-element="phone-element"]');
             const phoneId = phoneEl.dataset.phoneId;
-            //this.emit('phone-selected', phoneId);
-            console.log("Add to basket from catalog page: ",phoneId);
-            //let items = [];
-            items.push(phoneId);
-            console.log(items);
-            displayCart();
-
+            this.emit('add-phone', phoneId);
         })
-
-        function displayCart() {
-            let cartdata = `
-            <table>
-
-            `;
-
-            let total = 0;
-
-            for (let i = 0; i < items.length; i++) {
-
-                cartdata += `<tr><td>` + items[i] + `</td><td>` +
-
-                `<button>Delete</button>
-                </td></tr>`
-            }
-
-            cartdata += `<tr><td></td><td></td><td></td><td></td></tr></table>`;
-
-            document.querySelector('[data-component="shopping-cart"]').innerHTML = cartdata
-        }
-
-
-
-
-
-
     }
 
     _render() {
@@ -77,7 +38,11 @@ export default class PhonesCatalog extends Component{
                         <img alt="${phone.name}™ with Wi-Fi" src="${phone.imageUrl}">
                         </a>
                         <div class="phones__btn-buy-wrapper">
-                        <a class="btn btn-success" data-element="add-button">
+                        
+                        <a
+                        class="btn btn-success"
+                        data-element="add-to-cart"
+                        >
                             Add
                         </a>
                         </div>

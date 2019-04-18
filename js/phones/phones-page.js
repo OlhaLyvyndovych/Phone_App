@@ -1,15 +1,14 @@
 import PhonesCatalog from './components/phones-catalog.js';
 import PhoneViewer from './components/phone-viewer.js';
+import ShoppingCart from './components/shopping-cart.js';
 import PhonesService from './services/phones-service.js';
-import ShoppingCart from './components/shopping-cart.js'; // added
-
 export default class PhonesPage {
     constructor({ element }) {
         this._element = element;
         this._render();
-
         this._initCatalog();
         this._initViewer();
+        this._initCart();
 
     }
 
@@ -18,7 +17,6 @@ export default class PhonesPage {
             element: this._element.querySelector('[data-component="phone-catalog"]'),
             phones: PhonesService.getAll()
         })
-
         this._catalog.subscribe('phone-selected', (id) => {
             console.log('Selected: ', id);
             const phoneDetails = PhonesService.getById(id);
@@ -26,27 +24,30 @@ export default class PhonesPage {
             this._viewer.show(phoneDetails);
         })
 
-
+        this._catalog.subscribe('add-phone', (phoneId) => {
+            this._cart.addToCart(phoneId);
+        })
     }
 
     _initViewer() {
         this._viewer = new PhoneViewer({
             element: this._element.querySelector('[data-component="phone-viewer"]')
         })
-
         this._viewer.subscribe('back', () => {
             this._catalog.show();
             this._viewer.hide();
         })
+
+        this._viewer.subscribe('add-phone', (phoneId) => {
+            this._cart.addToCart(phoneId);
+        })
     }
 
-    _initShoppingCart() {
-        this._shoppingCart = new ShoppingCart({
+    _initCart() {
+        this._cart = new ShoppingCart({
             element: this._element.querySelector('[data-component="shopping-cart"]')
         })
-        this._shoppingCart.render();
     }
-
     _render() {
         this._element.innerHTML = `
         <div class="row">
@@ -66,12 +67,7 @@ export default class PhonesPage {
             </p>
             </section>
             <section>
-            <p>Shopping Cart</p>
-            <ul data-component="shopping-cart" >
-                <li>Phone 1</li>
-                <li>Phone 2</li>
-                <li>Phone 3</li>
-            </ul>
+                <div data-component="shopping-cart"></div>
             </section>
         </div>
         <!--Main content-->
